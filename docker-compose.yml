@@ -1,0 +1,61 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json
+services:
+  frontend:
+    build:
+      context: React-Frontend 
+    image: ahmed1102001/frontend-react:latest
+    restart: always
+    container_name: frontend
+    ports:
+      - "8080:80"
+    networks:
+      - front-back
+    depends_on:
+      - backend
+  backend:
+    build:
+      context: DotNet-Backend 
+    image: ahmed1102001/backend-dotnet-api:latest
+    container_name: backend
+    restart: always
+    ports:
+      - "5033:5033"
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: productsdb
+      DB_USER: root
+      DB_PASSWORD_FILE: /run/secrets/db_password
+
+    networks:
+      - front-back
+      - back-db
+    depends_on:
+    - db
+    secrets:
+      - db_password
+
+  db:
+    image: mysql:8.0
+    container_name: db
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_password
+      - MYSQL_DATABASE=productsdb
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - back-db
+    secrets:
+      - db_password  
+
+volumes:
+  db-data:
+
+networks:
+  front-back:
+  back-db:
+
+secrets:
+  db_password:
+    file: ./db_password.txt

@@ -1,0 +1,84 @@
+---
+- name: Deploy 3-Tier Docker App
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  become: yes
+  become_method: sudo
+
+  vars_files:
+    - vars/main.yml
+    - vars/secrets.yml
+
+  tasks:
+    - name: Ensure community.docker collection is installed
+      ansible.builtin.command:
+        cmd: ansible-galaxy collection install community.docker --force
+      changed_when: false
+
+    - name: Ensure prerequisite packages installed (CentOS)
+      ansible.builtin.yum:
+        name:
+          - yum-utils
+          - device-mapper-persistent-data
+          - lvm2
+          - curl
+          - ca-certificates
+        state: present
+
+    - name: Add Docker CE repository
+      ansible.builtin.yum_repository:
+        name: docker-ce-stable
+        description: Docker CE Stable - $basearch
+        baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
+        gpgcheck: yes
+        gpgkey: https://download.docker.com/linux/centos/gpg
+        enabled: yes
+
+    - name: Install Docker CE
+      ansible.builtin.yum:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+
+    - name: Ensure Docker service is running
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Docker login
+      community.docker.docker_login:
+        username: "{{ DOCKER_USERNAME }}"
+        password: "{{ DOCKER_PASSWORD }}"
+
+    - name: Create db_password.txt with variable content
+      copy:
+        dest: ./db_password.txt
+        content: "{{ DB_PASSWORD }}"
+        mode: '0600'
+
+    - name: Build & push images (loop)
+      community.docker.docker_image:
+        build:
+          path: "{{ item.path }}"
+          dockerfile: "{{ item.path }}/Dockerfile"  
+        name: "{{ DOCKER_USERNAME }}/{{ item.name }}"
+        tag: "{{ item.tag }}"
+        source: build
+        push: true
+      loop: "{{ images }}"
+
+    - name: Run docker-compose (v2)
+      community.docker.docker_compose_v2:
+        project_src: "{{ playbook_dir }}"
+        build: never
+        state: present
+        pull: never
+
+    - name: Remove db_password.txt
+      file:
+        path: ./db_password.txt
+        state: absent

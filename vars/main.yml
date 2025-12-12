@@ -1,0 +1,9 @@
+DOCKER_USERNAME: "ahmed1102001"
+
+images:
+  - name: "frontend-react"
+    tag: "latest"
+    path: "/home/rkha/Desktop/Docker-Ansible-Project/React-Frontend"
+  - name: "backend-dotnet-api"
+    tag: "latest"
+    path: "/home/rkha/Desktop/Docker-Ansible-Project/DotNet-Backend"
