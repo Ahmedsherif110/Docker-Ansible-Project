@@ -293,50 +293,7 @@ After successful execution:
 
 ---
 
-# ✅ Submission Requirements
 
-You must create a **GitHub Repository** that contains the following:
-
-### 📁 Required Files & Structure
-
-* ✅ Frontend Dockerfile
-* ✅ Backend Dockerfile
-* ✅ `docker-compose.yml`
-* ✅ `playbook.yml`
-* ✅ `vars/main.yml`
-* ✅ `vars/secrets.yml` (encrypted with Ansible Vault)
-
----
-
-### 📁 Screenshots Folder
-
-You must include a folder in the repository containing:
-
-* ✅ Screenshot of the application running at:
-
-  ```
-  http://localhost:8080
-  ```
-
-* ✅ Screenshot proving database connectivity by:
-
-  * Creating a **product with your name** from the UI
-  * Verifying that the product is successfully stored in the database
-
----
-
-## 📤 Final Submission
-
-After completing the project:
-
-* Push the full project to a **GitHub repository**
-* Send the **GitHub repository link via email** to:
-
-```
-mohamedosama.route@gmail.com
-```
-
----
 
 ✅ This project validates your skills in:
 
@@ -346,4 +303,4 @@ mohamedosama.route@gmail.com
 * Secure Credentials Handling with Vault
 * Full 3-Tier Application Deployment
 
-🚀 Good luck with your submission!
+
